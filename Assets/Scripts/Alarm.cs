@@ -5,30 +5,33 @@ using UnityEngine;
 public class Alarm : MonoBehaviour
 {
     [SerializeField] private AudioSource _alarmAudio;
+    private Coroutine _changeVolumeJob;
     private int _minVolume = 0;
     private int _maxVolume = 100;
     private float _valueSpeed = 0.2f;
 
     public void Play()
     {
-        StopAllCoroutines();
-        _alarmAudio.Play();
-        var changeVolumeJob = StartCoroutine(ChangeVolume(_maxVolume));
-
-        if (_alarmAudio.volume == _maxVolume)
+        if(_changeVolumeJob != null)
         {
-            StopCoroutine(changeVolumeJob);
+            StopCoroutine(_changeVolumeJob);
         }
+
+        _alarmAudio.Play();
+        _changeVolumeJob = StartCoroutine(ChangeVolume(_maxVolume));
     }
 
     public void Stop()
     {
-        StopAllCoroutines();
-        var changeVolumeJob = StartCoroutine(ChangeVolume(_minVolume));
+        if (_changeVolumeJob != null)
+        {
+            StopCoroutine(_changeVolumeJob);
+        }
+
+        _changeVolumeJob = StartCoroutine(ChangeVolume(_minVolume));
 
         if(_alarmAudio.volume == _minVolume)
         {
-            StopCoroutine(changeVolumeJob);
             _alarmAudio.Stop();
         }
     }
